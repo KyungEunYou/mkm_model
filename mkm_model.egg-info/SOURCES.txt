@@ -1,0 +1,10 @@
+README.md
+setup.py
+mkm_model.egg-info/PKG-INFO
+mkm_model.egg-info/SOURCES.txt
+mkm_model.egg-info/dependency_links.txt
+mkm_model.egg-info/top_level.txt
+model/__init__.py
+model/elem_rxn.py
+thermochemistry/__init__.py
+thermochemistry/functions.py

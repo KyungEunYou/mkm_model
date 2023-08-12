@@ -40,5 +40,5 @@ reaction_conditions:
   P_react: {}
 
 reactor:
-  None
+  None # options; CSTR (TBD; PCF)
   
