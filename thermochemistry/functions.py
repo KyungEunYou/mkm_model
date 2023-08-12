@@ -155,24 +155,3 @@ class Thermochemistry:
 
         return e + zpe - self.kb * temperature * math.log(qvib)
 
-if __name__=="__main__":
-    import thermochemistry
-
-    file = f"{thermochemistry.EXAMPLE}/intermediates/I000/OUTCAR"
-    freq = f"{thermochemistry.EXAMPLE}/intermediates/I000/freq/freq.dat"
-
-    file2 = f"{thermochemistry.EXAMPLE}/intermediates/I010/OUTCAR"
-    freq2 = f"{thermochemistry.EXAMPLE}/intermediates/I010/freq/freq.dat"
-
-    thermo = Thermochemistry()
-
-    energy = thermo.energy_scf(file)
-    zpe = thermo.zero_point_correction(freq)
-    q = thermo.vibrational_partition_function(freq, temperature=298)
-    pe1 = thermo.get_potential_energy(file, freq)
-    pe2 = thermo.get_potential_energy(file2, freq2)
-    ge1 = thermo.get_free_energy(file, freq, temperature=573.15)
-    ge2 = thermo.get_free_energy(file2, freq2, temperature=573.15)
-    print(ge2-ge1)
-    print
-
