@@ -14,8 +14,11 @@ class ElementaryReactionStep:
         self.reaction_eqn = reaction_eqn
         if self.reaction_eqn is not None:
             self._left_terms, self._right_terms = _rxn_eqn_slicer(reaction_eqn)
-        self.adsorption = adsorption
+        self.adsorption_params = adsorption
         self.bag_of_energies = bag_of_energies
+
+        self._is_adsorption = False
+        self._adsorption_theory = None
         self._erxn = None
         self._ea_for = None
         self._ea_rev = None
@@ -27,8 +30,23 @@ class ElementaryReactionStep:
         self._equil_const = None
 
         # parameteres
-        self.h = 4.135667662e-15       #plank's constant in eVs
-        self.kb = 8.6173303e-5         #bolzmann's constant in eV/K
+        self._h = 4.135667662e-15       #plank's constant in eVs
+        self._kb = 8.6173303e-5         #bolzmann's constant in eV/K
+    
+    def __dir__(self):
+        attributes = super().__dir__()
+        selected_attr = [attr for attr in attributes if not attr.startswith("__") and not attr.startswith("_")]
+        return selected_attr
+
+    @property
+    def is_adsorption(self):
+        return _is_adsorption_step(self.reaction_eqn)
+    
+    @property
+    def adsorption_theory(self):
+        if _is_adsorption_step(self.reaction_eqn):
+            self._adsorption_theory = list(self.adsorption_params.keys())[0]
+            return self._adsorption_theory
 
     @property
     def erxn(self):
@@ -143,10 +161,10 @@ class ElementaryReactionStep:
         if self.bag_of_energies:
             t_range = list(self.grxn.keys())
             if _is_adsorption_step(self.reaction_eqn):
-                adsorption_theory = list(self.adsorption.keys())[0]            
+                adsorption_theory = list(self.adsorption_params.keys())[0]            
                 at = AdsorptionTheories(
                     adsorption_theory, 
-                    self.adsorption[adsorption_theory][self.label],
+                    self.adsorption_params[adsorption_theory][self.label],
                     t_range,
                 )
                 self._k_for = at.calculate()                    
@@ -154,7 +172,7 @@ class ElementaryReactionStep:
             else:
                 ga_for = self.ga_for
                 for t in t_range:
-                    self._k_for = (self.kb * float(t) / self.h) * np.exp(-ga_for[t] / self.kb / float(t))
+                    self._k_for = (self._kb * float(t) / self._h) * np.exp(-ga_for[t] / self._kb / float(t))
         return self._k_for
     
     @k_for.setter
@@ -174,7 +192,7 @@ class ElementaryReactionStep:
             else:
                 ga_rev = self.ga_rev
                 for t in t_range:
-                    self._k_rev = (self.kb * float(t) / self.h) * np.exp(-ga_rev[t] / self.kb / float(t))
+                    self._k_rev = (self._kb * float(t) / self._h) * np.exp(-ga_rev[t] / self._kb / float(t))
         return self._k_rev
 
     @k_rev.setter
@@ -187,7 +205,7 @@ class ElementaryReactionStep:
             grxn = self.grxn
             t_range = list(grxn.keys())
             for t in t_range:
-                self._equil_const = np.exp(- grxn[t] / self.kb / float(t))
+                self._equil_const = np.exp(- grxn[t] / self._kb / float(t))
         return self._equil_const
     
     @equilibrium_const.setter
@@ -216,5 +234,5 @@ if __name__=="__main__":
         bag_of_energies=bag_of_energies)
     # ers = ElementaryReactionStep()
     # ers.erxn = -0.1
-    print(ers.k_for)
+    print(ers.__dir__())
     print
