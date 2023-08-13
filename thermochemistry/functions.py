@@ -15,12 +15,6 @@ class Thermochemistry:
         self.h = 4.135667662e-15       #plank's constant in eV/s
         self.kb = 8.6173303e-5         #bolzmann's constant in eV/K
         self.c =  2.99792458e10        # speed of light in cm/s
-        self.kb_SI = 1.39064852e-23    #bolzmann's constant in (m^2)*(kg)*(s^-2)*(K^-1)
-        self.conv1 = 0.010364          #1kJ=0.010364 eV
-        self.conv2 = 1e-3              #1kg=1e-3g
-        self.conv3 = 100000            #1bar=100000pa
-        self.NA = 6.02e23              #Avogadro 6.02*10e23/mol 
-
 
     def energy_scf(self, file_path:str):
         file = Path(file_path).stem
