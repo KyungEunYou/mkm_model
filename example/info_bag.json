@@ -1,5 +1,53 @@
 {
-    "intermediates": {
+    "species": {
+        "*": {
+            "potential_energy": -1292.168238590178,
+            "free_energy": {
+                "573.15": -1292.361853640202
+            }
+        },
+        "H2_g": {
+            "potential_energy": -6.9326567994551,
+            "free_energy": {
+                "573.15": -7.1326567994551
+            }
+        },
+        "hexane_g": {
+            "potential_energy": -103.5015842831070,
+            "free_energy": {
+                "573.15": -103.8015842831070
+            }
+        },
+        "1hexene_g": {
+            "potential_energy": -95.6059615759302,
+            "free_energy": {
+                "573.15": -95.9059615759302
+            }
+        },
+        "cis2hexene_g": {
+            "potential_energy": -95.6404578114573,
+            "free_energy": {
+                "573.15": -95.9404578114573
+            }
+        },
+        "trans2hexene_g": {
+            "potential_energy": -95.6674806718782,
+            "free_energy": {
+                "573.15": -95.9674806718782
+            }
+        },
+        "1propene_g": {
+            "potential_energy": -47.4947258329269,
+            "free_energy": {
+                "573.15": -47.7947258329269
+            }
+        },
+        "propane_g": {
+            "potential_energy": -55.4162216720417,
+            "free_energy": {
+                "573.15": -55.7162216720417
+            }
+        },
         "I000": {
             "potential_energy": -1298.8101233340908,
             "free_energy": {
