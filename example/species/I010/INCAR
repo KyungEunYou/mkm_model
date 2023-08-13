@@ -1,0 +1,42 @@
+System = mZrO2_n111
+
+ISMEAR = 0
+SIGMA = 0.05
+ENCUT = 500
+NSW = 0
+NELM = 300
+IBRION = 2
+EDIFF = 1E-6
+EDIFFG = -0.02
+
+#LORBIT = 11
+LREAL = Auto
+LWAVE = .FALSE.
+LCHARG = .FALSE.
+
+ISTART = 1
+ICHARG = 1
+
+# spin polarized
+ISPIN = 2
+
+# surface
+ISIF = 2
+IDIPOL = 3
+LCORR = .TRUE.
+NPAR = 8
+NSIM = 8
+NBANDS = 640
+
+# D3 correction
+LVDW    = .TRUE.
+VDW_VERSION = 3
+IVDW  = 11
+
+# U parameter
+LDAU = .TRUE.
+LDAUTYPE = 2
+LDAUL = 2 -1 -1
+LDAUU = 4 0 0
+LDAUJ = 0 0 0
+
