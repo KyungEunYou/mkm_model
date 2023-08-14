@@ -17,10 +17,6 @@ class ElementaryReactionStep:
         self.adsorption_params = adsorption
         self.bag_of_energies = bag_of_energies
 
-        # for mkm
-        self.rate_for = None
-        self.rate_rev = None
-
         self._is_adsorption = False
         self._adsorption_theory = None
         self._erxn = None
