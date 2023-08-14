@@ -17,6 +17,10 @@ class ElementaryReactionStep:
         self.adsorption_params = adsorption
         self.bag_of_energies = bag_of_energies
 
+        # for mkm
+        self.rate_for = None
+        self.rate_rev = None
+
         self._is_adsorption = False
         self._adsorption_theory = None
         self._erxn = None
@@ -37,6 +41,10 @@ class ElementaryReactionStep:
         attributes = super().__dir__()
         selected_attr = [attr for attr in attributes if not attr.startswith("__") and not attr.startswith("_")]
         return selected_attr
+    
+    @property
+    def temperature_range(self):
+        return list(self.grxn.keys())
 
     @property
     def is_adsorption(self):
@@ -159,7 +167,7 @@ class ElementaryReactionStep:
     @property
     def k_for(self):
         if self.bag_of_energies:
-            t_range = list(self.grxn.keys())
+            t_range = self.temperature_range
             if _is_adsorption_step(self.reaction_eqn):
                 adsorption_theory = list(self.adsorption_params.keys())[0]            
                 at = AdsorptionTheories(
@@ -171,8 +179,10 @@ class ElementaryReactionStep:
 
             else:
                 ga_for = self.ga_for
+                rate_constants = {}
                 for t in t_range:
-                    self._k_for = (self._kb * float(t) / self._h) * np.exp(-ga_for[t] / self._kb / float(t))
+                    rate_constants[t] = (self._kb * float(t) / self._h) * np.exp(-ga_for[t] / self._kb / float(t))
+                    self._k_for = rate_constants
         return self._k_for
     
     @k_for.setter
@@ -182,17 +192,20 @@ class ElementaryReactionStep:
     @property
     def k_rev(self):
         if self.bag_of_energies:
-            t_range = list(self.grxn.keys())
+            t_range = self.temperature_range
+            rate_constants = {}
             if _is_adsorption_step(self.reaction_eqn):
                 equil_const = self.equilibrium_const
                 k_for = self.k_for
                 for t in t_range:
-                    self._k_rev = k_for[t] / equil_const                  
+                    rate_constants[t] = k_for[t] / equil_const[t]
+                    self._k_rev = rate_constants             
 
             else:
                 ga_rev = self.ga_rev
                 for t in t_range:
-                    self._k_rev = (self._kb * float(t) / self._h) * np.exp(-ga_rev[t] / self._kb / float(t))
+                    rate_constants[t] = (self._kb * float(t) / self._h) * np.exp(-ga_rev[t] / self._kb / float(t))
+                    self._k_rev = rate_constants
         return self._k_rev
 
     @k_rev.setter
@@ -204,8 +217,10 @@ class ElementaryReactionStep:
         if self.bag_of_energies:
             grxn = self.grxn
             t_range = list(grxn.keys())
+            eq_constants = {}
             for t in t_range:
-                self._equil_const = np.exp(- grxn[t] / self._kb / float(t))
+                eq_constants[t] = np.exp(- grxn[t] / self._kb / float(t))
+                self._equil_const = eq_constants
         return self._equil_const
     
     @equilibrium_const.setter
