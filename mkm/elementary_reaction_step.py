@@ -1,6 +1,6 @@
 from mkm.utils import (
-    _rxn_eqn_slicer,
     _is_adsorption_step,
+    _rxn_eqn_slicer,
     _free_site_regulator,
     _delta_energy,
 )
