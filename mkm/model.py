@@ -70,14 +70,18 @@ class MKM:
 
         return self.result_coverages, self.result_rates
     
-    def plot_coverages(self, save=True):
+    def plot_coverages(self, save=False, selected_labels:list=None):
         i = 0 
         while i < self.result_coverages.shape[1]:
-            plt.plot(self.t, self.result_coverages[:, i], label=self.y_list[i])
-            i += 1 
+            if (not selected_labels or 
+                (selected_labels and self.y_list[i] in selected_labels)):
+                plt.plot(self.t, self.result_coverages[:, i], label=self.y_list[i])
+            i += 1
+        plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
         plt.xlabel("Time(s)")
         plt.ylabel("Fractional Coverages")
         plt.grid()
+        plt.show()
         if save==True:
             plt.savefig("coverages.png", dpi=1000)
    
