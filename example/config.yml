@@ -22,18 +22,18 @@ rxn_eqn:
   r21: "I006* + I010* -> I015* + *"
 
 int_ads_site:
-  I000: 1
-  I001: 1
-  I002: 1
-  I003: 1
-  I004: 1
-  I006: 1
-  I008: 1
-  I010: 1
-  I011: 1
-  I012: 1
-  I014: 1
-  I015: 1
+  I000*: 1
+  I001*: 1
+  I002*: 1
+  I003*: 1
+  I004*: 1
+  I006*: 1
+  I008*: 1
+  I010*: 1
+  I011*: 1
+  I012*: 1
+  I014*: 1
+  I015*: 1
 
 adsorption:
   collision_theory:
@@ -68,11 +68,12 @@ adsorption:
       ma: 44.097
 
 reaction_conditions:
-  T: [573.15] # unit K
-  P_react: 
-  - H2_g: 1 # unit bar
-    hexane_g: 
-
-reactor:
-  None # (TBD; CSTR, PCR)
+  pressure: 
+    H2_g: 10 # unit bar
+    hexane_g: 1
+    1hexene_g: 0
+    cis2hexene_g: 0
+    trans2hexene_g: 0
+    1propene_g: 0
+    propane_g: 0
   

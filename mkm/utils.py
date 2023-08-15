@@ -49,16 +49,25 @@ def _free_site_regulator_for_mkm(left, right, ads_info:dict):
     left = dict(Counter(left))
     return left, right
 
-def _multipliers(one_side:dict, coverage:dict, pressures_info:dict):
+def _add_y_ind(left, right, y_list, pressures):
+    for term in [left, right]:
+        for label, nums in term.items():
+            if label in pressures:
+                term[label] = pressures[label]
+            else:
+                term[label] = (nums, y_list.index(label))
+
+    return left, right
+
+
+def _multipliers(y, map:dict):
     multiplier = 1
-    for ads, site in one_side.items():
-        if ads.endswith("_g"):
-            try:
-                multiplier *= pressures_info[ads]
-            except:
-                print(f"{ads} is not in pressure information")
+    for _, nums in map.items():
+        if isinstance(nums, tuple):
+            multiplier *= y[nums[1]]**nums[0]
         else:
-            multiplier *= coverage[ads]**site
+            multiplier *= nums
+
     return multiplier
 
 def _delta_energy(
