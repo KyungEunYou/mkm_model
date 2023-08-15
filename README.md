@@ -1,5 +1,4 @@
 # mkm_model
---------------------------------------------------------------
 
 * This is a microkinetic model for thermo-catalytic surface reactions
 
