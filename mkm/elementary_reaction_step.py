@@ -14,10 +14,9 @@ class ElementaryReactionStep:
         self.reaction_eqn = reaction_eqn
         if self.reaction_eqn is not None:
             self._left_terms, self._right_terms = _rxn_eqn_slicer(reaction_eqn)
-        self.adsorption_params = adsorption
-        self.bag_of_energies = bag_of_energies
+        self._adsorption_params = adsorption
+        self._bag_of_energies = bag_of_energies
 
-        self._is_adsorption = False
         self._adsorption_theory = None
         self._erxn = None
         self._ea_for = None
@@ -41,25 +40,40 @@ class ElementaryReactionStep:
     @property
     def temperature_range(self):
         return list(self.grxn.keys())
+    
+    @property
+    def bag_of_energies(self):
+        bag = {}
+        bag.update({k:self._bag_of_energies['species'][k] for k in self._left_terms+self._right_terms})
+        if self.is_adsorption:
+            bag.update({"transition_states":None})
+        else:
+            bag.update({"transition_states":self._bag_of_energies['transition_states'][self.label]})
+        return bag    
 
     @property
     def is_adsorption(self):
         return _is_adsorption_step(self.reaction_eqn)
     
     @property
+    def adsorption_params(self):
+        ads_theory = self.adsorption_theory
+        return self._adsorption_params[ads_theory][self.label]
+    
+    @property
     def adsorption_theory(self):
         if _is_adsorption_step(self.reaction_eqn):
-            self._adsorption_theory = list(self.adsorption_params.keys())[0]
+            self._adsorption_theory = list(self._adsorption_params.keys())[0]
             return self._adsorption_theory
 
     @property
     def erxn(self):
-        if self.bag_of_energies:
+        if self._bag_of_energies:
             left, right = _free_site_regulator(self._left_terms, self._right_terms)
 
             try:
                 self._erxn = _delta_energy(
-                    self.bag_of_energies,left, right, energy_type="potential_energy")
+                    self._bag_of_energies,left, right, energy_type="potential_energy")
             except:
                 print(f"One or more species not found in bag_of_energies for {self.label}: {self.reaction_eqn}")      
         return self._erxn
@@ -70,7 +84,7 @@ class ElementaryReactionStep:
     
     @property
     def ea_for(self):
-        if self.bag_of_energies:
+        if self._bag_of_energies:
             # activation energy is for elementary surface reaction
             # the rate constant of adsorption step is calculated by collision theory without activation energy
             if not _is_adsorption_step(self.reaction_eqn):
@@ -81,7 +95,7 @@ class ElementaryReactionStep:
                 right[0] = self.label
                 try:
                     self._ea_for = _delta_energy(
-                        self.bag_of_energies, left, right, energy_type="potential_energy")
+                        self._bag_of_energies, left, right, energy_type="potential_energy")
                 except:
                     print(f"One or more species/transition state not found in bag_of_energies for {self.label}: {self.reaction_eqn}") 
         
@@ -93,14 +107,14 @@ class ElementaryReactionStep:
 
     @property
     def ea_rev(self):
-        if self.bag_of_energies:
+        if self._bag_of_energies:
             if not _is_adsorption_step(self.reaction_eqn):
                 right = ["ts*"]
                 left, right = _free_site_regulator(self._right_terms, right)
                 right[0] = self.label
                 try:
                     self._ea_rev = _delta_energy(
-                        self.bag_of_energies, left, right, energy_type="potential_energy")
+                        self._bag_of_energies, left, right, energy_type="potential_energy")
                 except:
                     print(f"One or more species/transition state not found in bag_of_energies for {self.label}: {self.reaction_eqn}")
 
@@ -108,12 +122,12 @@ class ElementaryReactionStep:
     
     @property
     def grxn(self):
-        if self.bag_of_energies:
+        if self._bag_of_energies:
             left, right = _free_site_regulator(self._left_terms, self._right_terms)
 
             try:
                 self._grxn = _delta_energy(
-                    self.bag_of_energies, left, right, energy_type="free_energy")
+                    self._bag_of_energies, left, right, energy_type="free_energy")
             except:
                 print(f"One or more species not found in bag_of_energies for {self.label}: {self.reaction_eqn}")      
         return self._grxn
@@ -124,7 +138,7 @@ class ElementaryReactionStep:
     
     @property
     def ga_for(self):
-        if self.bag_of_energies:
+        if self._bag_of_energies:
             # activation energy is for elementary surface reaction
             # the rate constant of adsorption step is calculated by collision theory without activation energy
             if not _is_adsorption_step(self.reaction_eqn):
@@ -135,7 +149,7 @@ class ElementaryReactionStep:
                 right[0] = self.label
                 try:
                     self._ga_for = _delta_energy(
-                        self.bag_of_energies, left, right, energy_type="free_energy")
+                        self._bag_of_energies, left, right, energy_type="free_energy")
                 except:
                     print(f"One or more species/transition state not found in bag_of_energies for {self.label}: {self.reaction_eqn}") 
         
@@ -147,14 +161,14 @@ class ElementaryReactionStep:
 
     @property
     def ga_rev(self):
-        if self.bag_of_energies:
+        if self._bag_of_energies:
             if not _is_adsorption_step(self.reaction_eqn):
                 right = ["ts*"]
                 left, right = _free_site_regulator(self._right_terms, right)
                 right[0] = self.label
                 try:
                     self._ga_rev = _delta_energy(
-                        self.bag_of_energies, left, right, energy_type="free_energy")
+                        self._bag_of_energies, left, right, energy_type="free_energy")
                 except:
                     print(f"One or more species/transition state not found in bag_of_energies for {self.label}: {self.reaction_eqn}")
 
@@ -162,13 +176,13 @@ class ElementaryReactionStep:
 
     @property
     def k_for(self):
-        if self.bag_of_energies:
+        if self._bag_of_energies:
             t_range = self.temperature_range
             if _is_adsorption_step(self.reaction_eqn):
-                adsorption_theory = list(self.adsorption_params.keys())[0]            
+                adsorption_theory = list(self._adsorption_params.keys())[0]            
                 at = AdsorptionTheories(
                     adsorption_theory, 
-                    self.adsorption_params[adsorption_theory][self.label],
+                    self._adsorption_params[adsorption_theory][self.label],
                     t_range,
                 )
                 self._k_for = at.calculate()                    
@@ -187,7 +201,7 @@ class ElementaryReactionStep:
 
     @property
     def k_rev(self):
-        if self.bag_of_energies:
+        if self._bag_of_energies:
             t_range = self.temperature_range
             rate_constants = {}
             if _is_adsorption_step(self.reaction_eqn):
@@ -210,7 +224,7 @@ class ElementaryReactionStep:
 
     @property
     def equilibrium_const(self):
-        if self.bag_of_energies:
+        if self._bag_of_energies:
             grxn = self.grxn
             t_range = list(grxn.keys())
             eq_constants = {}
@@ -232,7 +246,7 @@ if __name__=="__main__":
     with open(yaml_file) as f:
         config = yaml.safe_load(f)
     
-    json_file = f"{mkm.EXAMPLE}/info_bag.json"
+    json_file = f"{mkm.EXAMPLE}/bag_of_energies.json"
     with open(json_file) as f:
         bag_of_energies = json.load(f)
     
@@ -245,5 +259,6 @@ if __name__=="__main__":
         bag_of_energies=bag_of_energies)
     # ers = ElementaryReactionStep()
     # ers.erxn = -0.1
+    print(ers.bag_of_energies)
     print(ers.__dir__())
     print

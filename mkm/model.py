@@ -10,23 +10,25 @@ from mkm.utils import (
 
 class MKM:
     """
+    reaction_network: dict e.g. {"r1": ElementaryReactionStep, "r2": ElementaryReactionStep}
+
     y_list: list
             in the order of the y0, this is to safely map the matrix
     config: dict, example of yaml file is in example directory
-    reaction_network: dict e.g. {"r1": ElementaryReactionStep, "r2": ElementaryReactionStep}
+    reactant_pressures: dict, e.g. {'H2_g': 10, 'hexane_g': 1, 1hexene_g: 0}; unit: bar
     temperature_interest: int or float, choose one of temperature that is in your bag_of_energies.json
     """
     def __init__(
             self,
             reaction_network:dict, 
-            config:dict, 
-            y_list:list, 
-            temperature_interest:int or float or str
+            y_list:list,
+            adsorption_sites:dict,
+            reactant_pressures:dict,
+            temperature_interest:int or float or str,
             ):            
         self.reaction_network = reaction_network
-        self.rxn_eqn = config.get("rxn_eqn", {})
-        self.ads_site = config.get("int_ads_site", {})
-        self.pressures = config.get("reaction_conditions", {}).get("pressure", {})
+        self.ads_site = adsorption_sites
+        self.pressures = reactant_pressures
 
         self.y_list = y_list
         self.temperature = str(temperature_interest)
@@ -157,8 +159,16 @@ if __name__=="__main__":
     y[y_list.index("*")] = 1
     
     print(y)
-    
-    mkm = MKM(rxn_network, config, y_list, temperature)
+
+    pressure = config.get("reaction_conditions", {}).get("pressure", {})
+    ads_sites = config.get("int_ads_site", {})
+
+    mkm = MKM(
+        rxn_network, 
+        y_list,
+        ads_sites,
+        pressure, 
+        temperature)
     cov, result_rates = mkm.compute(y, t)
     mkm.plot_coverages()
 
