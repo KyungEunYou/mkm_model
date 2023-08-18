@@ -163,7 +163,7 @@ class ElementaryReactionStep:
                     try:
                         self._ga_for = _delta_energy(
                             self._bag_of_energies, left, right, energy_type="free_energy")
-                        return self._ga_for
+                        return {t:max(ga, 0.0) for t, ga in self._ga_for.items()} 
                     except:
                         print(f"One or more species/transition state not found in bag_of_energies for {self.label}: {self.reaction_eqn}") 
 
@@ -184,7 +184,7 @@ class ElementaryReactionStep:
                     try:
                         self._ga_rev = _delta_energy(
                             self._bag_of_energies, left, right, energy_type="free_energy")
-                        return self._ga_rev
+                        return {t:max(ga, 0.0) for t, ga in self._ga_rev.items()} 
                     except:
                         print(f"One or more species/transition state not found in bag_of_energies for {self.label}: {self.reaction_eqn}")
 
@@ -278,21 +278,11 @@ if __name__=="__main__":
     json_file = f"{mkm.EXAMPLE}/bag_of_energies.json"
     with open(json_file) as f:
         bag_of_energies = json.load(f)
-    
-    # bag_of_energies["species"].pop("*")
-    from ase.atoms import Atoms
-    d = 1.1
-    co = Atoms('CO', positions=[(0, 0, 0), (0, 0, d)])
-    co.pbc = [True, True, True]
-    print(co.pbc)
-
         
     ers = ElementaryReactionStep(
-        "r1", 
-        config.get("rxn_eqn", {}).get("r1", None),
+        "r14", 
+        config.get("rxn_eqn", {}).get("r14", None),
         adsorption = config["adsorption"],
         bag_of_energies=bag_of_energies)
-    print(ers.erxn)
-    ers.erxn = -0.1
-    print(ers.erxn)
+    print(ers.ga_for)
     print
